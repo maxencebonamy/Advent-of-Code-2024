@@ -1,0 +1,6 @@
+{
+	"extends": [
+		"plugin:@maxencebonamy/base",
+		"plugin:@maxencebonamy/typescript"
+	]
+}
