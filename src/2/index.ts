@@ -21,8 +21,22 @@ const isReportSafe = (report: number[]): boolean => {
 	return true
 }
 
-const lines = readFile("2/input.txt")
+const isReportAlmostSafe = (report: number[]): boolean => {
+	if (isReportSafe(report)) return true
 
+	for (let index = 0; index < report.length; index++) {
+		const reportWithoutElement = report.filter((_, i) => index !== i)
+		if (isReportSafe(reportWithoutElement)) return true
+	}
+
+	return false
+}
+
+const lines = readFile("2/input.txt")
 const reports = lines.map(parseReport)
+
 const safeReports = reports.filter(isReportSafe)
 logger.info(`First solution: ${safeReports.length}`)
+
+const almostSafeReports = reports.filter(isReportAlmostSafe)
+logger.info(`Second solution: ${almostSafeReports.length}`)
