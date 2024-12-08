@@ -42,15 +42,40 @@ const computeAntinodes = (couple: [Point, Point], lines: string[]): Point[] => {
 	return [ firstAntinode, secondAntinode ].filter(([ x, y ]) => x >= 0 && y >= 0 && x < lines[0].length && y < lines.length)
 }
 
+const computeAntinodesWithHarmonics = (couple: [Point, Point], lines: string[]): Point[] => {
+	const [ [ x1, y1 ], [ x2, y2 ] ] = couple
+	const dx = x2 - x1
+	const dy = y2 - y1
+	const antinodes: Point[] = []
+
+	const max = Math.max(lines.length, lines[0].length)
+	for (let i = -max; i <= max; i++) {
+		const firstAntinode = [ x1 + (i * dx), y1 + (i * dy) ] as Point
+		const secondAntinode = [ x2 - (i * dx), y2 - (i * dy) ] as Point
+		antinodes.push(firstAntinode, secondAntinode)
+	}
+
+	return antinodes.filter(([ x, y ]) => x >= 0 && y >= 0 && x < lines[0].length && y < lines.length)
+}
+
 const lines = readFile("8/input.txt")
 const antennas = getAllAtennas(lines)
 const couples = computeAntennaCouples(antennas, lines)
 
-const antinodes: Point[] = []
+const firstAntinodes: Point[] = []
 for (const couple of couples) {
 	const newAntinodes = computeAntinodes(couple, lines)
 	for (const antinode of newAntinodes) {
-		if (!antinodes.some(([ x, y ]) => x === antinode[0] && y === antinode[1])) antinodes.push(antinode)
+		if (!firstAntinodes.some(([ x, y ]) => x === antinode[0] && y === antinode[1])) firstAntinodes.push(antinode)
 	}
 }
-logger.info(`First solution: ${antinodes.length}`)
+logger.info(`First solution: ${firstAntinodes.length}`)
+
+const secondAntinodes: Point[] = []
+for (const couple of couples) {
+	const newAntinodes = computeAntinodesWithHarmonics(couple, lines)
+	for (const antinode of newAntinodes) {
+		if (!secondAntinodes.some(([ x, y ]) => x === antinode[0] && y === antinode[1])) secondAntinodes.push(antinode)
+	}
+}
+logger.info(`Second solution: ${secondAntinodes.length}`)
