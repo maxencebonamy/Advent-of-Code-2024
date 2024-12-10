@@ -26,7 +26,7 @@ export const getConsecutiveNeighbors = (point: Point, map: number[][]): Point[] 
 	return neighbors
 }
 
-export const getTotalTrails = (map: number[][]): number => {
+export const getTotalScore = (map: number[][]): number => {
 	let trails: Point[][] = []
 	for (let y = 0; y < map.length; y++) {
 		for (let x = 0; x < map[0].length; x++) {
@@ -56,7 +56,32 @@ export const getTotalTrails = (map: number[][]): number => {
 	return sum(trails.map(trail => trail.length))
 }
 
+export const getTotalRating = (map: number[][]): number => {
+	let trailHeads: Point[] = []
+	for (let y = 0; y < map.length; y++) {
+		for (let x = 0; x < map[0].length; x++) {
+			if (map[y][x] === 0) {
+				trailHeads.push([ x, y ])
+			}
+		}
+	}
+
+	for (let i = 1; i <= 9; i++) {
+		const newTrailHeads: Point[] = []
+		for (const trailHead of trailHeads) {
+			const neighbors = getConsecutiveNeighbors(trailHead, map)
+			newTrailHeads.push(...neighbors)
+		}
+		trailHeads = newTrailHeads
+	}
+	return trailHeads.length
+}
+
 const lines = readFile("10/input.txt")
 const map = parseMap(lines)
-const totalTrails = getTotalTrails(map)
-logger.info(`First solution: ${totalTrails}`)
+
+const score = getTotalScore(map)
+logger.info(`First solution: ${score}`)
+
+const rating = getTotalRating(map)
+logger.info(`Second solution: ${rating}`)
