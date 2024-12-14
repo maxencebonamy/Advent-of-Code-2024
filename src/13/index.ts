@@ -33,25 +33,28 @@ const parseMachines = (lines: string[]): Machine[] => {
 	return machines
 }
 
-const computeCheapestCost = (machine: Machine): number => {
-	let cost: number | null = null
-
-	for (let i = 1; i <= 100; i++) {
-		for (let j = 1; j <= 100; j++) {
-			if ((i * machine.buttonA.x) + (j * machine.buttonB.x) === machine.prize.x
-				&& (i * machine.buttonA.y) + (j * machine.buttonB.y) === machine.prize.y) {
-				const newCost = (i * BUTTON_A_COST) + (j * BUTTON_B_COST)
-				if (!cost || newCost < cost) {
-					cost = newCost
-				}
-			}
-		}
+const computeCost = (machine: Machine): number => {
+	const den = (machine.buttonA.x * machine.buttonB.y) - (machine.buttonA.y * machine.buttonB.x)
+	if (den === 0) {
+		return 0
 	}
+	const pressesA = ((machine.prize.x * machine.buttonB.y) - (machine.prize.y * machine.buttonB.x)) / den
+	const pressesB = ((machine.buttonA.x * machine.prize.y) - (machine.buttonA.y * machine.prize.x)) / den
+	if (pressesA < 0 || pressesB < 0 || pressesA % 1 !== 0 || pressesB % 1 !== 0) {
+		return 0
+	}
+	return (pressesA * BUTTON_A_COST) + (pressesB * BUTTON_B_COST)
+}
 
-	return cost ?? 0
+const fixMachine = (machine: Machine, factor: number): Machine => {
+	return { ...machine, prize: { x: machine.prize.x + factor, y: machine.prize.y + factor } }
 }
 
 const lines = readFile("13/input.txt")
 const machines = parseMachines(lines)
-const costs = machines.map(computeCheapestCost)
+const costs = machines.map(computeCost)
 logger.info(`First solution: ${sum(costs)}`)
+
+const fixedMachines = machines.map(machine => fixMachine(machine, 10000000000000))
+const costsOptimized = fixedMachines.map(computeCost)
+logger.info(`Second solution: ${sum(costsOptimized)}`)
